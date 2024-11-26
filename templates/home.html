@@ -15,8 +15,9 @@
                 <li>
                     <h2>{{ post.title }}</h2>
                     <p>{{ post.content }}</p>
-                    <p><em>Category: {{ post.category }}</em></p>
-                    <p><small>Published on: {{ post.date }}</small></p>
+                    <p><em>Category: {{ post.category_name }}</em></p>
+                    <p><small>Published on: {{ post.created_at }}</small></p>
+                    <p><small>Author: {{post.author_name}}</small></p>
                 </li>
             {% endfor %}
         </ul>
