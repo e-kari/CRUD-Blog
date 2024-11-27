@@ -1,0 +1,33 @@
+{% block content %}
+    <h2>Edit Post</h2>
+
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <label for="title">Title</label>
+        <input type="text" name="title" id="title" value="{{ post.title }}" required><br>
+
+        <label for="content">Content</label>
+        <textarea name="content" id="content" required>{{ post.content }}</textarea><br>
+
+        <label for="category">Category</label>
+        <select name="category" id="category" required>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id == post.category_id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select><br>
+
+        <button type="submit">Update Post</button>
+    </form>
+{% endblock %}

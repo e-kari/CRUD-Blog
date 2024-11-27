@@ -50,28 +50,20 @@ def load_user(user_id):
 @app.route('/')
 @login_required  # Protect the page to require login
 def home():
-    # Create a connection to the database
     connection = get_db_connection()
-    
-    # Create a cursor object to execute queries
     cursor = connection.cursor(dictionary=True)
 
-    # Query to select all blog posts & appropriate fields
     cursor.execute(''' 
         SELECT posts.*, categories.name AS category_name, users.username AS author_name
         FROM posts
         JOIN categories ON posts.category_id = categories.id
         JOIN users ON posts.user_id = users.id
     ''')
-    
-    # Fetch all results of the query
     posts = cursor.fetchall()
 
-    # Close the database connection
     cursor.close()
     connection.close()
 
-    # Render the posts on the homepage using an HTML template
     return render_template('home.html', posts=posts)
 
 # Create the login route
@@ -81,7 +73,6 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # Check if the user exists in the database
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
@@ -92,7 +83,7 @@ def login():
         if user and check_password_hash(user['password'], password):
             user_obj = User(user['id'], user['username'], user['role'])
             login_user(user_obj)
-            return redirect(url_for('home'))
+            return redirect(url_for('dashboard'))  # Redirect to dashboard after login
         else:
             flash('Login failed. Check your username and/or password.', 'danger')
 
@@ -100,7 +91,7 @@ def login():
 
 # Create the logout route
 @app.route('/logout')
-@login_required  # Protect the page to require login
+@login_required
 def logout():
     logout_user()
     flash('You have been logged out.', 'info')
@@ -114,7 +105,6 @@ def register():
         password = request.form['password']
         role = 'user'  # Default role for regular users
 
-        # Check if the username already exists in the database
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
@@ -125,10 +115,8 @@ def register():
             flash('Username already exists. Please choose a different username.', 'danger')
             return render_template('register.html')
 
-        # Hash the password before saving
         hashed_password = generate_password_hash(password)
 
-        # Insert the user into the database
         cursor = conn.cursor()
         cursor.execute('INSERT INTO users (username, password, role) VALUES (%s, %s, %s)', 
                        (username, hashed_password, role))
@@ -140,6 +128,125 @@ def register():
         return redirect(url_for('login'))
     
     return render_template('register.html')
+
+# Define the route for the dashboard
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    user_id = current_user.id
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute(''' 
+        SELECT posts.*, categories.name AS category_name
+        FROM posts
+        JOIN categories ON posts.category_id = categories.id
+        WHERE posts.user_id = %s
+    ''', (user_id,))
+    
+    user_posts = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return render_template('dashboard.html', posts=user_posts)
+
+# Route to create a new post
+@app.route('/create_post', methods=['GET', 'POST'])
+@login_required
+def create_post():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    # Fetch only the 4 categories (IDs 1-4)
+    cursor.execute('SELECT * FROM categories WHERE id IN (1, 2, 3, 4)')
+    categories = cursor.fetchall()
+
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        category_id = request.form['category']
+
+        cursor.execute('INSERT INTO posts (title, content, category_id, user_id) VALUES (%s, %s, %s, %s)', 
+                       (title, content, category_id, current_user.id))
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        flash('Post created successfully!', 'success')
+        return redirect(url_for('dashboard'))
+
+    cursor.close()
+    connection.close()
+    return render_template('create_post.html', categories=categories)
+
+# Route to edit an existing post
+@app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def edit_post(post_id):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    # Fetch only the 4 categories (IDs 1-4)
+    cursor.execute('SELECT * FROM categories WHERE id IN (1, 2, 3, 4)')
+    categories = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM posts WHERE id = %s AND user_id = %s', (post_id, current_user.id))
+    post = cursor.fetchone()
+
+    if not post:
+        flash('Post not found or you do not have permission to edit it.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        category_id = request.form['category']
+
+        cursor.execute(''' 
+            UPDATE posts 
+            SET title = %s, content = %s, category_id = %s
+            WHERE id = %s
+        ''', (title, content, category_id, post_id))
+        connection.commit()
+
+        flash('Post updated successfully!', 'success')
+        return redirect(url_for('dashboard'))
+
+    cursor.close()
+    connection.close()
+
+    return render_template('edit_post.html', post=post, categories=categories)
+
+# Route to delete an existing post
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Check if the current user is an admin (Enya) or the post belongs to the current user
+    cursor.execute('SELECT * FROM posts WHERE id = %s', (post_id,))
+    post = cursor.fetchone()
+
+    if not post:
+        flash('Post not found.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    if current_user.username == 'enya' or post['user_id'] == current_user.id:
+        # Admin or the user who created the post can delete the post
+        cursor.execute('DELETE FROM posts WHERE id = %s', (post_id,))
+        connection.commit()
+
+        flash('Post deleted successfully!', 'success')
+    else:
+        flash('You do not have permission to delete this post.', 'danger')
+
+    cursor.close()
+    connection.close()
+
+    return redirect(url_for('dashboard'))
 
 # Run the Flask app
 if __name__ == '__main__':
