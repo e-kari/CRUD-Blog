@@ -26,3 +26,18 @@ form {
 .register-link {
     margin-top: 10px;
 }
+
+.post-list {
+    list-style-type: none; /* Removes bullet points */
+    padding: 0;            /* Removes default padding */
+    margin: 0;             /* Removes default margin */
+}
+
+.post-item {
+    margin-bottom: 20px;   /* Adds some space between posts */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9; /*Light background color for posts */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /*Adds a subtle shadow */
+}
