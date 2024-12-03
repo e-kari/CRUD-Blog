@@ -1,30 +1,35 @@
-<form method="POST">
-    <label for="title">Title</label>
-    <input type="text" name="title" id="title" required><br>
+{% extends "base.html" %}
 
-    <label for="content">Content</label>
-    <textarea name="content" id="content" required></textarea><br>
+{% block content %}
+    <div class="container">
+        <h2>Create Post</h2>
 
-    <label for="category">Category</label>
-    <select name="category" id="category" required>
-        {% for category in categories %}
-            <option value="{{ category.id }}">{{ category.name }}</option>
-        {% endfor %}
-    </select><br>
+        <!-- Display Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
 
-    <button type="submit">Create Post</button>
-</form>
+        <form method="POST">
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" required><br>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <ul>
-            {% for category, message in messages %}
-                {% if category == 'success' %}
-                    <li class="success">{{ message }}</li>
-                {% elif category == 'danger' %}
-                    <li class="error">{{ message }}</li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
+            <label for="content">Content</label>
+            <textarea name="content" id="content" required></textarea><br>
+
+            <label for="category">Category</label>
+            <select name="category" id="category" required>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select><br>
+
+            <button type="submit">Create Post</button>
+        </form>
+    </div>
+{% endblock %}

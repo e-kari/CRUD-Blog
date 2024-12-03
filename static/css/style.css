@@ -1,8 +1,4 @@
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     margin: 0;
     font-family: Arial, sans-serif;
     background-color: lightsteelblue;
@@ -16,7 +12,8 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #fafafa;
     width: 100%;
-    max-width: 400px; /* Adjust the max width as necessary */
+    max-width: 400px;
+    margin: 70px auto 0 auto;
 }
 
 form {
@@ -28,16 +25,138 @@ form {
 }
 
 .post-list {
-    list-style-type: none; /* Removes bullet points */
-    padding: 0;            /* Removes default padding */
-    margin: 0;             /* Removes default margin */
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }
 
 .post-item {
-    margin-bottom: 20px;   /* Adds some space between posts */
+    margin-bottom: 20px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    background-color: #f9f9f9; /*Light background color for posts */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /*Adds a subtle shadow */
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for form inputs, including text and password fields */
+input[type="text"], input[type="password"], textarea, select {
+    width: 100%; 
+    max-width: 100%; /* Ensures the elements don't exceed the container width */
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    transition: all 0.3s ease-in-out;
+    box-sizing: border-box; /* Ensures padding doesn't add extra width */
+}
+
+/* Focus effects for inputs */
+input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
+    border-color: #6c8ebf;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(108, 142, 191, 0.8);
+    outline: none;
+}
+
+/* Styling for the submit button */
+button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+/* Hover effect for the submit button */
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Styling for the select dropdown */
+select {
+    padding: 10px;
+    background-color: #f8f8f8;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box; /* Ensures padding doesn't add extra width */
+    transition: all 0.3s ease-in-out;
+}
+
+/* Styling for the select dropdown on focus */
+select:focus {
+    border-color: #6c8ebf;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(108, 142, 191, 0.8);
+    outline: none;
+}
+
+/* Styling for the textarea */
+textarea {
+    height: 150px; /* Set a reasonable height for the textarea */
+    resize: vertical; /* Allow vertical resizing of the textarea */
+}
+
+.flash-messages {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.flash-messages li {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+.flash-messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.flash-messages li.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Navigation Bar Styling */
+nav {
+    background-color: #333;
+    padding: 10px 20px;
+    position: sticky;  /* Keeps the navbar at the top even when scrolling */
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Makes sure the items align horizontally */
+    justify-content: space-around; /* Distribute the links evenly */
+}
+
+nav ul li {
+    display: inline-block;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    font-size: 16px;
+}
+
+nav a:hover {
+    background-color: #555; /* Change background on hover */
+    border-radius: 5px;
 }
