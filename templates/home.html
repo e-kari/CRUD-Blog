@@ -1,24 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1>All Posts</h1>
+<div class="container">
+    <h1>All Posts</h1>
 
-        <!-- Loop through all posts and display them -->
-        {% if posts %}
-            <ul class="post-list">
-                {% for post in posts %}
-                    <li class="post-item">
-                        <h2>{{ post.title }}</h2>
-                        <p>{{ post.content }}</p>
-                        <p><small>Category: {{ post.category_name }}</small></p>
-                        <p><small>Published on: {{ post.created_at }}</small></p>
-                        <p><small>Author: {{ post.author_name }}</small></p>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No posts available.</p>
-        {% endif %}
-    </div>
+    <!-- Loop through all posts and display them -->
+    {% if posts %}
+        <ul class="post-list">
+            {% for post in posts %}
+                <li class="post-item">
+                    <h2>{{ post.title }}</h2>
+                    <p>{{ post.content }}</p>
+                    <p><small>Category: {{ post.category_name }}</small></p>
+                    <p><small>Published on: {{ post.created_at }}</small></p>
+                    <p><small>Author: {{ post.author_name }}</small></p>
+
+                    <!-- Delete Button -->
+                    {% if current_user.username == 'enya' or current_user.id == post.user_id %}
+                        <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No posts available.</p>
+    {% endif %}
+</div>
 {% endblock %}
